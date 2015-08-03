@@ -1,6 +1,7 @@
 *.swp
 target/*
 lib*
+*.log
 *.orig
 *jar
 .idea
