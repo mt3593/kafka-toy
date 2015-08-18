@@ -4,6 +4,7 @@
   :dependencies [[ch.qos.logback/logback-classic "1.1.3"]
                  [cheshire "5.4.0"]
                  [clj-http "1.1.2"]
+                 [clj-kafka "0.3.2"]
                  [clj-time "0.9.0"]
                  [compojure "1.3.4"]
                  [environ "1.0.0"]

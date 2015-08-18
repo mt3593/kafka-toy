@@ -18,6 +18,8 @@
 (def version
   (setup/version "kafka-toy"))
 
+(def topic-messages (atom {}))
+
 (defn healthcheck
   []
   (let [body {:name "kafka-toy"
@@ -37,13 +39,23 @@
        [] "pong")
 
   (POST "/topic/:topic"
-        [] "")
+        req
+        (let [{body :body-params {topic :topic} :route-params} req]
+          (println req)
+          (swap! topic-messages #(merge-with concat % {topic [body]}))
+          {:status 200}))
+
+  (PUT "/topic/:topic"
+       req
+       {:status 200})
 
   (GET "/topic/:topic"
        [topic]
-       {:status 200
-        :body {:topic topic
-               :messages ["test message"]}})
+       (if-let [topics (get @topic-messages topic)]
+         {:status 200
+          :body {:topic topic
+                 :messages topics}}
+         {:status 404}))
 
   (route/not-found (error-response "Resource not found" 404)))
 
