@@ -38,19 +38,36 @@
   (GET "/ping"
        [] "pong")
 
+  (GET "/topics"
+       req
+       {:status 200
+        :body (keys @topic-messages)})
+
   (POST "/topic/:topic"
         req
         (let [{body :body-params {topic :topic} :route-params} req]
           (println req)
-          (swap! topic-messages #(merge-with concat % {topic [body]}))
-          {:status 200}))
+          (if (get @topic-messages topic)
+            (do (swap! topic-messages #(merge-with concat % {topic [body]}))
+                {:status 200})
+            {:status 404})))
 
   (PUT "/topic/:topic"
-       req
+       [topic]
+       (swap! topic-messages #(merge-with concat % {topic []}))       
        {:status 200})
+
+  (DELETE "/topic/:topic"
+          [topic]
+          (if-let [topics (get @topic-messages topic)]
+            (do
+              (swap! topic-messages #(dissoc % topic))
+              {:status 200})
+            {:status 404}))
 
   (GET "/topic/:topic"
        [topic]
+       (println (@topic-messages topic))
        (if-let [topics (get @topic-messages topic)]
          {:status 200
           :body {:topic topic
